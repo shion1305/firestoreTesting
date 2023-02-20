@@ -21,13 +21,12 @@ func main() {
 	}
 	ctx := context.Background()
 	client := getFirestore(ctx)
-	_, err = client.Collection("test").Doc("test").Set(ctx, map[string]interface{}{
-		"test": "test",
-	})
-	if err != nil {
-		log.Printf("Error writing document: %v", err)
-		return
-	}
+	defer client.Close()
+	testCase1(client)
+	testCase2(client)
+	testCase3(client)
+	testCase01(client)
+	testCase02(client)
 }
 
 func getFirestore(ctx context.Context) *fs.Client {
