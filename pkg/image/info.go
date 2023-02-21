@@ -11,6 +11,18 @@ type JPEGInfo struct{}
 type PNGInfo struct{}
 type WEBPInfo struct{}
 
+func NewJPEGInfo() JPEGInfo {
+	return JPEGInfo{}
+}
+
+func NewPNGInfo() PNGInfo {
+	return PNGInfo{}
+}
+
+func NewWEBPInfo() WEBPInfo {
+	return WEBPInfo{}
+}
+
 func (p JPEGInfo) ExtractInfo(data []byte) (width, height int, err error) {
 	config, err := jpeg.DecodeConfig(bytes.NewReader(data))
 	if err != nil {
