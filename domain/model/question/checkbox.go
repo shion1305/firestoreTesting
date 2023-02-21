@@ -12,6 +12,7 @@ type (
 
 	CheckBoxQuestion struct {
 		ID           ID
+		Text         string
 		Options      []CheckBoxOption
 		OptionsOrder []CheckBoxOptionID
 	}
@@ -22,12 +23,19 @@ type (
 	}
 )
 
-const CheckBoxOptionsField = "options"
+const (
+	CheckBoxOptionsField      = "options"
+	CheckBoxOptionsOrderField = "order"
+)
 
-func NewCheckBoxQuestion(id ID, options []CheckBoxOption) *CheckBoxQuestion {
+func NewCheckBoxQuestion(
+	id ID, text string, options []CheckBoxOption, optionsOrder []CheckBoxOptionID,
+) *CheckBoxQuestion {
 	return &CheckBoxQuestion{
-		ID:      id,
-		Options: options,
+		ID:           id,
+		Text:         text,
+		Options:      options,
+		OptionsOrder: optionsOrder,
 	}
 }
 
@@ -44,14 +52,31 @@ func ImportCheckBoxQuestion(q StandardQuestion) (*CheckBoxQuestion, error) {
 			fmt.Sprintf("\"%s\" must be map[int64]string for CheckBoxQuestion", CheckBoxOptionsField))
 	}
 
+	// check if customs has "order" as []int64, return error if not
+	optionsOrderDataI, has := q.Customs[CheckBoxOptionsOrderField]
+	if !has {
+		return nil, errors.New(
+			fmt.Sprintf("\"%s\" is required for CheckBoxQuestion", CheckBoxOptionsOrderField))
+	}
+	optionsOrderData, ok := optionsOrderDataI.([]int64)
+	if !ok {
+		return nil, errors.New(
+			fmt.Sprintf("\"%s\" must be []int64 for CheckBoxQuestion", CheckBoxOptionsOrderField))
+	}
+
 	options := make([]CheckBoxOption, 0, len(optionsData))
+	optionsOrder := make([]CheckBoxOptionID, 0, len(optionsOrderData))
+	for _, id := range optionsOrderData {
+		optionsOrder = append(optionsOrder, identity.NewID(id))
+	}
+
 	for id, text := range optionsData {
 		options = append(options, CheckBoxOption{
 			ID:   identity.NewID(id),
 			Text: text,
 		})
 	}
-	return NewCheckBoxQuestion(q.ID, options), nil
+	return NewCheckBoxQuestion(q.ID, q.Text, options, optionsOrder), nil
 }
 
 func (q CheckBoxQuestion) Export() StandardQuestion {
@@ -61,10 +86,5 @@ func (q CheckBoxQuestion) Export() StandardQuestion {
 		options[option.ID.GetValue()] = option.Text
 	}
 	customs[CheckBoxOptionsField] = options
-	return StandardQuestion{
-		ID:      q.ID,
-		Text:    q.Options[0].Text,
-		Type:    TypeCheckBox,
-		Customs: customs,
-	}
+	return NewStandardQuestion(TypeCheckBox, q.ID, q.Text, customs)
 }
