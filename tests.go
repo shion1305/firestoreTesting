@@ -7,19 +7,42 @@ import (
 	"fmt"
 )
 
+const (
+	Type1 Type = 1
+	Type2 Type = 2
+)
+
 type (
-	Form struct {
-		Questions map[string]Question `firestore:"questions"`
+	//Form struct {
+	//	Questions map[string]Question `firestore:"questions"`
+	//}
+
+	ObjectAbstract struct {
+		ID           string      `firestore:"-"`
+		QuestionText string      `firestore:"question"`
+		Type         int         `firestore:"question_type"`
+		Order        int         `firestore:"order"`
+		Properties   interface{} `firestore:"properties"`
 	}
 
-	Question struct {
-		ID           string             `firestore:"-"`
-		QuestionText string             `firestore:"question"`
-		QuestionType int                `firestore:"question_type"`
-		Order        int                `firestore:"order"`
-		Properties   QuestionProperties `firestore:"properties"`
+	ObjectConcrete interface {
+		GetType() (ObjectConcrete, error)
 	}
-	QuestionProperties map[string]interface{}
+
+	ObjectConcrete1 struct {
+		ID           string `firestore:"-"`
+		QuestionText string `firestore:"question"`
+		QuestionType Type   `firestore:"question_type"`
+		Order        int    `firestore:"order"`
+		Properties2  map[string]string
+	}
+
+	ObjectConcrete2 struct {
+		ID           string `firestore:"-"`
+		QuestionText string `firestore:"question"`
+	}
+
+	Type int
 )
 
 func testCase1(client *firestore.Client) {
