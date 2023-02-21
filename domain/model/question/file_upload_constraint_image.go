@@ -77,11 +77,11 @@ func (c ImageFileConstraint) Export() StandardFileConstraint {
 		})
 }
 
-func (c ImageFileConstraint) GetType() FileType {
+func (c ImageFileConstraint) GetFileType() FileType {
 	return Image
 }
 
-func (c ImageFileConstraint) ValidateFile(files []File) error {
+func (c ImageFileConstraint) ValidateFiles(files []File) error {
 	if c.MinNumber > 0 && len(files) < c.MinNumber {
 		return errors.New(fmt.Sprintf(
 			"number of files not satisfied. min number: %d, actual number: %d", c.MinNumber, len(files)))
