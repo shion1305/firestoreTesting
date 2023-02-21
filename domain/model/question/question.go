@@ -22,6 +22,7 @@ type (
 const (
 	TypeCheckBox Type = 1
 	TypeRadio    Type = 2
+	TypeFile     Type = 3
 )
 
 func NewStandardQuestion(t Type, id ID, text string, customs map[string]interface{}) StandardQuestion {
