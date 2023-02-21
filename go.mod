@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	cloud.google.com/go/firestore v1.9.0
+	github.com/godruoyi/go-snowflake v0.0.2
 	github.com/joho/godotenv v1.4.0
 	google.golang.org/api v0.107.0
 )
