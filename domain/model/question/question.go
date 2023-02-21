@@ -8,7 +8,6 @@ type (
 	ID       util.ID
 	Type     int
 	Question interface {
-		GetID() ID
 		Export() StandardQuestion
 	}
 
@@ -24,3 +23,12 @@ const (
 	TypeCheckBox Type = 1
 	TypeRadio    Type = 2
 )
+
+func NewStandardQuestion(t Type, id ID, text string, customs map[string]interface{}) StandardQuestion {
+	return StandardQuestion{
+		ID:      id,
+		Text:    text,
+		Type:    t,
+		Customs: customs,
+	}
+}
