@@ -8,7 +8,11 @@ type (
 	FileConstraint interface {
 		GetFileType() FileType
 		Export() StandardFileConstraint
-		ValidateFiles(filename string, file [][]byte) error
+		ValidateFiles(file []File) error
+	}
+	File struct {
+		FileName string
+		Data     []byte
 	}
 )
 

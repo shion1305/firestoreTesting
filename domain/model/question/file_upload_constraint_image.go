@@ -81,16 +81,27 @@ func (c ImageFileConstraint) GetType() FileType {
 	return Image
 }
 
-func (c ImageFileConstraint) ValidateFile(filename string, file []byte) error {
-	// get file extension
-	ext := filepath.Ext(filename)
-	imgType, err := c.checkExtension(ext)
-	if err != nil {
-		return err
+func (c ImageFileConstraint) ValidateFile(files []File) error {
+	if c.MinNumber > 0 && len(files) < c.MinNumber {
+		return errors.New(fmt.Sprintf(
+			"number of files not satisfied. min number: %d, actual number: %d", c.MinNumber, len(files)))
 	}
-	err = c.validateProperties(imgType, file)
-	if err != nil {
-		return err
+	if c.MaxNumber > 0 && len(files) > c.MaxNumber {
+		return errors.New(fmt.Sprintf(
+			"number of files not satisfied. max number: %d, actual number: %d", c.MaxNumber, len(files)))
+	}
+
+	for _, file := range files {
+		// get file extension
+		ext := filepath.Ext(file.FileName)
+		imgType, err := c.checkExtension(ext)
+		if err != nil {
+			return err
+		}
+		err = c.validateProperties(imgType, file.Data)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
