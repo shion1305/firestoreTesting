@@ -4,6 +4,7 @@ import (
 	"errors"
 	"firestoreTesting/domain/model/util"
 	"firestoreTesting/pkg/identity"
+	"fmt"
 )
 
 type (
@@ -21,6 +22,8 @@ type (
 	}
 )
 
+const CheckBoxOptionsField = "options"
+
 func NewCheckBoxQuestion(id ID, options []CheckBoxOption) *CheckBoxQuestion {
 	return &CheckBoxQuestion{
 		ID:      id,
@@ -29,14 +32,16 @@ func NewCheckBoxQuestion(id ID, options []CheckBoxOption) *CheckBoxQuestion {
 }
 
 func ImportCheckBoxQuestion(q StandardQuestion) (*CheckBoxQuestion, error) {
-	// check if customs has "options" as map[int64]string, return error if not
-	optionsDataI, has := q.Customs["options"]
+	// check if customs has CheckBoxOptionsField as map[int64]string, return error if not
+	optionsDataI, has := q.Customs[CheckBoxOptionsField]
 	if !has {
-		return nil, errors.New("\"options\" is required for CheckBoxQuestion")
+		return nil, errors.New(
+			fmt.Sprintf("\"%s\" is required for CheckBoxQuestion", CheckBoxOptionsField))
 	}
 	optionsData, ok := optionsDataI.(map[int64]string)
 	if !ok {
-		return nil, errors.New("\"options\" must be map[int64]string for CheckBoxQuestion")
+		return nil, errors.New(
+			fmt.Sprintf("\"%s\" must be map[int64]string for CheckBoxQuestion", CheckBoxOptionsField))
 	}
 
 	options := make([]CheckBoxOption, 0, len(optionsData))
@@ -55,7 +60,7 @@ func (q CheckBoxQuestion) Export() StandardQuestion {
 	for _, option := range q.Options {
 		options[option.ID.GetValue()] = option.Text
 	}
-	customs["options"] = options
+	customs[CheckBoxOptionsField] = options
 	return StandardQuestion{
 		ID:      q.ID,
 		Text:    q.Options[0].Text,
