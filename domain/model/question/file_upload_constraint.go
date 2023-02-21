@@ -22,3 +22,12 @@ func NewStandardFileConstraint(fileType FileType, options map[string]interface{}
 		Options:  options,
 	}
 }
+
+func ImportFileConstraint(standard StandardFileConstraint) FileConstraint {
+	switch standard.FileType {
+	case Image:
+		return ImportImageFileConstraint(standard)
+	default:
+		return nil
+	}
+}
