@@ -3,110 +3,107 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"context"
-	"errors"
+	"firestoreTesting/domain/model/question"
+	"firestoreTesting/infra/entity"
+	"firestoreTesting/pkg/identity"
 	"fmt"
 )
 
-const (
-	Type1 Type = 1
-	Type2 Type = 2
-)
-
-type (
-	//Form struct {
-	//	Questions map[string]Question `firestore:"questions"`
-	//}
-
-	ObjectAbstract struct {
-		ID           string      `firestore:"-"`
-		QuestionText string      `firestore:"question"`
-		Type         int         `firestore:"question_type"`
-		Order        int         `firestore:"order"`
-		Properties   interface{} `firestore:"properties"`
-	}
-
-	ObjectConcrete interface {
-		GetType() (ObjectConcrete, error)
-	}
-
-	ObjectConcrete1 struct {
-		ID           string `firestore:"-"`
-		QuestionText string `firestore:"question"`
-		QuestionType Type   `firestore:"question_type"`
-		Order        int    `firestore:"order"`
-		Properties2  map[string]string
-	}
-
-	ObjectConcrete2 struct {
-		ID           string `firestore:"-"`
-		QuestionText string `firestore:"question"`
-	}
-
-	Type int
-)
-
 func testCase1(client *firestore.Client) {
-	fmt.Println("testCase1")
-	e := Form{
-		Questions: map[string]Question{
-			"q1": {
-				ID:           "q1",
-				QuestionText: "q1",
-				QuestionType: 1,
-				Order:        1,
-				Properties: QuestionProperties{
-					"optionID1": map[string]interface{}{
-						"text":  "text1",
-						"order": 1,
-					},
-					"optionID2": map[string]interface{}{
-						"text":  "text2",
-						"order": 2,
-					},
-				},
-			},
-			"q2": {
-				ID:           "q2",
-				QuestionText: "q2",
-				QuestionType: 1,
-				Order:        2,
-				Properties: QuestionProperties{
-					"optionID1": map[string]interface{}{
-						"text":  "text1",
-						"order": 1,
-					},
-					"optionID2": map[string]interface{}{
-						"text":  "text2",
-						"order": 2,
-					},
-				},
-			},
-		},
+	fileQuestion := question.NewFileQuestion(identity.IssueID(), "file question", question.Image,
+		question.NewImageFileConstraint(
+			1, 1, 1, 1, 200, 200, 200, []string{"jpg", "png"}))
+
+	checkBoxOptions := []question.CheckBoxOption{
+		{ID: identity.IssueID(), Text: "option1"},
+		{ID: identity.IssueID(), Text: "option2"},
 	}
-	create, err := client.Collection("Forms").Doc("form1").Create(context.Background(), e)
+	checkBoxOptionsOrder := []question.CheckBoxOptionID{checkBoxOptions[0].ID, checkBoxOptions[1].ID}
+	checkboxQuestion := question.NewCheckBoxQuestion(
+		identity.IssueID(), "checkbox question", checkBoxOptions, checkBoxOptionsOrder)
+	outFileQuestion := entity.Question{
+		ID:      fileQuestion.ID.GetValue(),
+		Text:    fileQuestion.Text,
+		Type:    int(question.TypeFile),
+		Customs: fileQuestion.Export().Customs,
+	}
+	outCheckBoxQuestion := entity.Question{
+		ID:      checkboxQuestion.ID.GetValue(),
+		Text:    checkboxQuestion.Text,
+		Type:    int(question.TypeCheckBox),
+		Customs: checkboxQuestion.Export().Customs,
+	}
+
+	_, err := client.Collection("Questions").Doc("question1").
+		Set(context.Background(), outFileQuestion)
 	if err != nil {
-		fmt.Println("error")
-		fmt.Println(err)
-		fmt.Println(errors.Is(err, errors.New("document already exists")))
+		fmt.Printf("error: %v", err)
 		return
 	}
-	fmt.Println(create)
+
+	_, err = client.Collection("Questions").Doc("question2").
+		Set(context.Background(), outCheckBoxQuestion)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+
+	snap, err := client.Collection("Questions").Doc("question1").
+		Get(context.Background())
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	var e entity.Question
+	err = snap.DataTo(&e)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	model, err := e.ToModel()
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	fmt.Printf("%+v\n", model)
+
+	snap, err = client.Collection("Questions").Doc("question2").
+		Get(context.Background())
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	err = snap.DataTo(&e)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	model, err = e.ToModel()
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	fmt.Printf("%+v\n", model)
 }
 
 func testCase2(client *firestore.Client) {
-	fmt.Println("testCase2")
-	d, err := client.Collection("Forms").Doc("form1").Get(context.Background())
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	var e Form
-	err = d.DataTo(&e)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Printf("%+v\n", e)
+	//fmt.Println("testCase2")
+	//d, err := client.Collection("Forms").Doc("form1").Get(context.Background())
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//var e Form
+	//err = d.DataTo(&e)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//fmt.Printf("%+v\n", e)
 }
 
 func testCase3(client *firestore.Client) {
