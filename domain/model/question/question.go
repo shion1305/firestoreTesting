@@ -1,6 +1,7 @@
 package question
 
 import (
+	"errors"
 	"firestoreTesting/domain/model/util"
 )
 
@@ -31,5 +32,18 @@ func NewStandardQuestion(t Type, id ID, text string, customs map[string]interfac
 		Text:    text,
 		Type:    t,
 		Customs: customs,
+	}
+}
+
+func (q StandardQuestion) ToQuestion() (Question, error) {
+	switch q.Type {
+	case TypeCheckBox:
+		return ImportCheckBoxQuestion(q)
+	case TypeRadio:
+		return ImportRadioButtonsQuestion(q)
+	case TypeFile:
+		return ImportFileQuestion(q)
+	default:
+		return nil, errors.New("invalid question type")
 	}
 }
