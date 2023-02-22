@@ -20,7 +20,7 @@ const (
 	PDF                         FileType = 2
 	Any                         FileType = 3
 	FileQuestionFileTypeField            = "fileType"
-	FileConstraintsOptionsField          = "fileConstraints"
+	FileConstraintsCustomsField          = "fileConstraint"
 )
 
 func NewFileQuestion(id ID, text string, fileType FileType, constraint FileConstraint) *FileQuestion {
@@ -47,12 +47,12 @@ func ImportFileQuestion(q StandardQuestion) (*FileQuestion, error) {
 		return nil, errors.New(
 			fmt.Sprintf("\"%s\" is required for FileQuestion", FileQuestionFileTypeField))
 	}
-	fileTypeData, ok := fileTypeDataI.(int)
+	fileTypeData, ok := fileTypeDataI.(int64)
 	if !ok {
 		return nil, errors.New(
 			fmt.Sprintf("\"%s\" must be int for FileQuestion", FileQuestionFileTypeField))
 	}
-	fileType, err := NewFileType(fileTypeData)
+	fileType, err := NewFileType(int(fileTypeData))
 	if err != nil {
 		return nil, err
 	}
@@ -61,17 +61,20 @@ func ImportFileQuestion(q StandardQuestion) (*FileQuestion, error) {
 		return NewFileQuestion(q.ID, q.Text, fileType, nil), nil
 	}
 
-	constraintsOptionsData, has := q.Customs[FileConstraintsOptionsField]
+	constraintsCustomsData, has := q.Customs[FileConstraintsCustomsField]
+	// if FileConstraintsCustomsField is not present, return FileQuestion without constraint
 	if !has {
 		return NewFileQuestion(q.ID, q.Text, fileType, nil), nil
 	}
 
-	constraintsOptions, ok := constraintsOptionsData.(map[string]interface{})
+	constraintsCustoms, ok := constraintsCustomsData.(map[string]interface{})
+	// if FileConstraintsCustomsField Found, but it is not map[string]interface{}, return error
 	if !ok {
 		return nil, errors.New(
-			fmt.Sprintf("\"%s\" must be map[string]interface{} for FileQuestion", FileConstraintsOptionsField))
+			fmt.Sprintf("\"%s\" must be map[string]interface{} for FileQuestion", FileConstraintsCustomsField))
 	}
-	constraint := NewStandardFileConstraint(fileType, constraintsOptions)
+
+	constraint := NewStandardFileConstraint(fileType, constraintsCustoms)
 	question := NewFileQuestion(q.ID, q.Text, fileType, ImportFileConstraint(constraint))
 	if err != nil {
 		return nil, err
@@ -85,7 +88,7 @@ func (q FileQuestion) Export() StandardQuestion {
 	customs[FileQuestionFileTypeField] = q.FileType
 
 	if q.Constraint != nil {
-		customs[FileConstraintsOptionsField] = q.Constraint.Export()
+		customs[FileConstraintsCustomsField] = q.Constraint.Export().Customs
 	}
 	return NewStandardQuestion(TypeFile, q.ID, q.Text, customs)
 }

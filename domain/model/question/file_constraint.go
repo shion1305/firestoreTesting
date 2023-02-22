@@ -2,8 +2,8 @@ package question
 
 type (
 	StandardFileConstraint struct {
-		FileType FileType
-		Options  map[string]interface{}
+		Type    FileType
+		Customs map[string]interface{}
 	}
 	FileConstraint interface {
 		GetFileType() FileType
@@ -16,15 +16,15 @@ type (
 	}
 )
 
-func NewStandardFileConstraint(fileType FileType, options map[string]interface{}) StandardFileConstraint {
+func NewStandardFileConstraint(fileType FileType, customs map[string]interface{}) StandardFileConstraint {
 	return StandardFileConstraint{
-		FileType: fileType,
-		Options:  options,
+		Type:    fileType,
+		Customs: customs,
 	}
 }
 
 func ImportFileConstraint(standard StandardFileConstraint) FileConstraint {
-	switch standard.FileType {
+	switch standard.Type {
 	case Image:
 		return ImportImageFileConstraint(standard)
 	default:

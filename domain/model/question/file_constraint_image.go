@@ -50,17 +50,21 @@ func NewImageFileConstraint(
 }
 
 func ImportImageFileConstraint(standard StandardFileConstraint) ImageFileConstraint {
-	ratio, _ := standard.Options["ratio"].(float64)
-	minNumber, _ := standard.Options["minNumber"].(int)
-	maxNumber, _ := standard.Options["maxNumber"].(int)
-	minWidth, _ := standard.Options["minWidth"].(int)
-	maxWidth, _ := standard.Options["maxWidth"].(int)
-	minHeight, _ := standard.Options["minHeight"].(int)
-	maxHeight, _ := standard.Options["maxHeight"].(int)
-	exts, _ := standard.Options["extensions"].([]string)
+	ratio, _ := standard.Customs["ratio"].(float64)
+	minNumber, _ := standard.Customs["minNumber"].(int64)
+	maxNumber, _ := standard.Customs["maxNumber"].(int64)
+	minWidth, _ := standard.Customs["minWidth"].(int64)
+	maxWidth, _ := standard.Customs["maxWidth"].(int64)
+	minHeight, _ := standard.Customs["minHeight"].(int64)
+	maxHeight, _ := standard.Customs["maxHeight"].(int64)
+	extsI, _ := standard.Customs["extensions"].([]interface{})
+	exts := make([]string, len(extsI))
+	for i, extI := range extsI {
+		exts[i] = extI.(string)
+	}
 
 	return NewImageFileConstraint(
-		ratio, minNumber, maxNumber, minWidth, maxWidth, minHeight, maxHeight, exts)
+		ratio, int(minNumber), int(maxNumber), int(minWidth), int(maxWidth), int(minHeight), int(maxHeight), exts)
 }
 
 func (c ImageFileConstraint) Export() StandardFileConstraint {
