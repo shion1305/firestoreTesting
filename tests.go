@@ -37,36 +37,36 @@ func testCase1(client *firestore.Client) {
 	_, err := client.Collection("Questions").Doc("question1").
 		Set(context.Background(), outFileQuestion)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 
 	_, err = client.Collection("Questions").Doc("question2").
 		Set(context.Background(), outCheckBoxQuestion)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 
 	snap, err := client.Collection("Questions").Doc("question1").
 		Get(context.Background())
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	var e entity.Question
 	err = snap.DataTo(&e)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	model, err := e.ToModel()
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	fmt.Printf("%+v\n", model)
@@ -74,17 +74,17 @@ func testCase1(client *firestore.Client) {
 	snap, err = client.Collection("Questions").Doc("question2").
 		Get(context.Background())
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	err = snap.DataTo(&e)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	model, err = e.ToModel()
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		panic(err)
 		return
 	}
 	fmt.Printf("%+v\n", model)
