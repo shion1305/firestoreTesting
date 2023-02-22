@@ -92,3 +92,15 @@ func (q FileQuestion) Export() StandardQuestion {
 	}
 	return NewStandardQuestion(TypeFile, q.ID, q.Text, customs)
 }
+
+func (q FileQuestion) GetType() Type {
+	return TypeFile
+}
+
+func (q FileQuestion) GetID() ID {
+	return q.ID
+}
+
+func (q FileQuestion) GetText() string {
+	return q.Text
+}

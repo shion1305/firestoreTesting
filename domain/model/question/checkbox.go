@@ -112,3 +112,15 @@ func (q CheckBoxQuestion) Export() StandardQuestion {
 	customs[CheckBoxOptionsOrderField] = optionsOrder
 	return NewStandardQuestion(TypeCheckBox, q.ID, q.Text, customs)
 }
+
+func (q CheckBoxQuestion) GetType() Type {
+	return TypeCheckBox
+}
+
+func (q CheckBoxQuestion) GetID() ID {
+	return q.ID
+}
+
+func (q CheckBoxQuestion) GetText() string {
+	return q.Text
+}

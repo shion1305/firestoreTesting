@@ -10,6 +10,9 @@ type (
 	Type     int
 	Question interface {
 		Export() StandardQuestion
+		GetType() Type
+		GetID() ID
+		GetText() string
 	}
 
 	StandardQuestion struct {

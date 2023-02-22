@@ -94,3 +94,15 @@ func (q RadioButtonsQuestion) Export() StandardQuestion {
 
 	return NewStandardQuestion(TypeRadio, q.ID, q.Text, customs)
 }
+
+func (q RadioButtonsQuestion) GetType() Type {
+	return TypeRadio
+}
+
+func (q RadioButtonsQuestion) GetID() ID {
+	return q.ID
+}
+
+func (q RadioButtonsQuestion) GetText() string {
+	return q.Text
+}
